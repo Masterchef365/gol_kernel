@@ -17,11 +17,6 @@ const N_CELLS: usize = WIDTH * HEIGHT;
 
 type GolBuffer = [bool; N_CELLS];
 
-struct Conway {
-    buf_a: GolBuffer,
-    buf_b: GolBuffer,
-}
-
 fn random_gol(rng: &mut Rng, buf: &mut GolBuffer) {
     let n_bits = 32;
     for chunk in buf.chunks_mut(n_bits) {
@@ -35,7 +30,7 @@ fn random_gol(rng: &mut Rng, buf: &mut GolBuffer) {
 fn display_gol(gol: &GolBuffer) {
     for (i, &cell) in gol.iter().enumerate() {
         let color: u8 = match cell {
-            true => 0x0b,
+            true => 0x0c,
             false => 0x00,
         };
         let idx = 2 * i as isize;
@@ -107,16 +102,18 @@ pub extern "C" fn _start() -> ! {
     let mut buf_a = [false; N_CELLS];
     let mut buf_b = [false; N_CELLS];
 
-    random_gol(&mut rng, &mut buf_a);
-
-    let sleep = || for _ in 0..100_000 {};
+    let sleep = || for _ in 0..2_000_000 {};
+    //let sleep = || ();
 
     loop {
-        step_gol(&mut buf_b, &buf_a);
-        display_gol(&buf_b);
-        sleep();
-        step_gol(&mut buf_a, &buf_b);
-        display_gol(&buf_a);
-        sleep();
+        random_gol(&mut rng, &mut buf_a);
+        for _ in 0..90*8 {
+            step_gol(&mut buf_b, &buf_a);
+            display_gol(&buf_b);
+            sleep();
+            step_gol(&mut buf_a, &buf_b);
+            display_gol(&buf_a);
+            sleep();
+        }
     }
 }
